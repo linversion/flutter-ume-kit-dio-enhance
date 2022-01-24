@@ -46,7 +46,7 @@ class _SendDingTalkButtonState extends State<SendDingTalkButton> {
 
   @override
   Widget build(BuildContext context) {
-    return DioManager.instance.accessToken.isNotEmpty
+    return DioManager.instance.useBot
         ? Row(
             children: [
               _dingButton(),

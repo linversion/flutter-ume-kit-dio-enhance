@@ -10,19 +10,25 @@ import 'package:flutter_ume/core/pluggable.dart';
 import 'package:flutter_ume_kit_dio/src/net/dio_manager.dart';
 
 import 'models/http_interceptor.dart';
+import 'net/dio_manager.dart';
 import 'widgets/icon.dart' as icon;
 import 'widgets/pluggable_state.dart';
 
 // TODO(Alex): Implement [PluggableStream] for dot features.
 /// Implement a [Pluggable] to integrate with UME.
+
 class DioInspector extends StatefulWidget implements Pluggable {
   DioInspector({
     Key? key,
     required this.dio,
-    String? dingToken,
+    required String webhookUrl,
+    RequestBodyBuilder? requestBodyBuilder,
   }) : super(key: key) {
     dio.interceptors.add(UMEDioInterceptor());
-    DioManager.instance.setAccessToken(dingToken ?? '');
+    DioManager.instance.setWebhookUrl(webhookUrl);
+    if(requestBodyBuilder != null) {
+      DioManager.instance.setRequestBodyBuilder(requestBodyBuilder);
+    }
   }
 
   final Dio dio;

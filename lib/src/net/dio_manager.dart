@@ -1,27 +1,38 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
+typedef RequestBodyBuilder = Map<String, dynamic> Function(String content);
+const weiXin = 'https://qyapi.weixin.qq.com';
+const dingTalk = 'https://oapi.dingtalk.com';
+const feiShu = 'https://open.feishu.cn';
+
 class DioManager {
   static DioManager? _instance;
-  String accessToken = '';
-  static const int CONNECT_TIMEOUT = 15000;
-  static const int RECEIVE_TIMEOUT = 15000;
 
   late Dio _dio;
+  late bool useBot;
+
+  RequestBodyBuilder? requestBodyBuilder;
 
   DioManager._internal() {
     var options = BaseOptions(
-        connectTimeout: CONNECT_TIMEOUT,
-        receiveTimeout: RECEIVE_TIMEOUT,
-        headers: {'Content-Type': Headers.jsonContentType},
-        baseUrl: 'https://oapi.dingtalk.com/');
+      connectTimeout: 15000,
+      receiveTimeout: 15000,
+      headers: {'Content-Type': Headers.jsonContentType},
+    );
     _dio = Dio(options);
   }
 
   static DioManager get instance => _instance ??= DioManager._internal();
 
-  void setAccessToken(String token) {
-    this.accessToken = token;
+  void setRequestBodyBuilder(RequestBodyBuilder? builder) {
+    requestBodyBuilder = builder;
+    useBot = true;
+  }
+
+  void setWebhookUrl(String url) {
+    _dio.options.baseUrl = url;
+    initRequestBodyBuilder(url);
   }
 
   Future<bool> sendResponse({
@@ -34,20 +45,44 @@ class DioManager {
     required String method,
   }) async {
     try {
-      await _dio.post('robot/send', queryParameters: {
-        'access_token': accessToken
-      }, data: {
-        "msgtype": "text",
-        "text": {
-          "content": "agent: dio\n$statusCode $method duration: $duration\n$uri\n\nrequest data: "
-              "\n$requestData\n"
-              "\nresponse body: \n$responseBody\n\nrequest header\n$requestHeader"
-        }
-      });
+      var content = "agent: dio\n$statusCode $method duration: $duration\n$uri\n\nrequest data: "
+          "\n$requestData\n"
+          "\nresponse body: \n$responseBody\n\nrequest header\n$requestHeader";
+      await _dio.post('', data: requestBodyBuilder!(content));
       return true;
     } catch (error) {
-      debugPrint('error on send response');
+      debugPrint('error on send response: $error');
       return false;
+    }
+  }
+
+  Future<void> sendCustomText(String content) async {
+    try {
+      await _dio.post('', data: requestBodyBuilder!('not dio:\n $content'));
+    } catch (error) {
+      debugPrint('error on send response: $error');
+    }
+  }
+
+  void initRequestBodyBuilder(String url) {
+    if (url.startsWith(dingTalk) || url.startsWith(weiXin)) {
+      //钉钉或微信机器人
+      requestBodyBuilder = (content) => {
+        "msgtype": "text",
+        "text": {
+          "content": content
+        }
+      };
+      useBot = true;
+    } else if (url.startsWith(feiShu)) {
+      //飞书机器人
+      requestBodyBuilder = (content) => {
+        "msg_type": "text",
+        "content": {
+          "text": content
+        }
+      };
+      useBot = true;
     }
   }
 }

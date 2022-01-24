@@ -11,6 +11,7 @@ import 'package:flutter_ume_kit_dio/src/widgets/send_ding_talk_button.dart';
 import '../constants/extensions.dart';
 import '../instances.dart';
 import '../pluggable.dart';
+import 'custom_message_page.dart';
 
 const JsonEncoder _encoder = JsonEncoder.withIndent('  ');
 
@@ -30,12 +31,16 @@ ButtonStyle _buttonStyle(
   );
 }
 
-class DioPluggableState extends State<DioInspector> {
+class DioPluggableState extends State<DioInspector>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
   @override
   void initState() {
     super.initState();
     // Bind listener to refresh requests.
     InspectorInstance.httpContainer.addListener(_listener);
+    _tabController = TabController(length: 2, vsync: this);
   }
 
   @override
@@ -50,7 +55,9 @@ class DioPluggableState extends State<DioInspector> {
   /// since we've implemented the list with `findChildIndexCallback`.
   void _listener() {
     Future.microtask(() {
-      if (mounted && !context.debugDoingBuild && context.owner?.debugBuilding != true) {
+      if (mounted &&
+          !context.debugDoingBuild &&
+          context.owner?.debugBuilding != true) {
         setState(() {});
       }
     });
@@ -77,7 +84,8 @@ class DioPluggableState extends State<DioInspector> {
   }
 
   Widget _itemList(BuildContext context) {
-    final List<Response<dynamic>> requests = InspectorInstance.httpContainer.pagedRequests;
+    final List<Response<dynamic>> requests =
+        InspectorInstance.httpContainer.pagedRequests;
     final int length = requests.length;
     if (length > 0) {
       return CustomScrollView(
@@ -148,10 +156,22 @@ class DioPluggableState extends State<DioInspector> {
                     ],
                   ),
                 ),
+                TabBar(
+                  tabs: [
+                    Tab(
+                      text: 'request',
+                    ),
+                    Tab(text: 'custom message')
+                  ],
+                  controller: _tabController,
+                  labelColor: Colors.black,
+                ),
                 Expanded(
                   child: ColoredBox(
                     color: Theme.of(context).canvasColor,
-                    child: _itemList(context),
+                    child: TabBarView(
+                        controller: _tabController,
+                        children: [_itemList(context), CustomMessagePage()]),
                   ),
                 ),
               ],
