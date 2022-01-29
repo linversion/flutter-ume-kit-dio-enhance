@@ -7,7 +7,6 @@ import 'dart:convert';
 import 'package:dio/dio.dart' show Dio;
 import 'package:flutter/material.dart';
 import 'package:flutter_ume/core/pluggable.dart';
-import 'package:flutter_ume_kit_dio/src/net/dio_manager.dart';
 
 import 'models/http_interceptor.dart';
 import 'net/dio_manager.dart';
@@ -26,7 +25,7 @@ class DioInspector extends StatefulWidget implements Pluggable {
   }) : super(key: key) {
     dio.interceptors.add(UMEDioInterceptor());
     DioManager.instance.setWebhookUrl(webhookUrl);
-    if(requestBodyBuilder != null) {
+    if (requestBodyBuilder != null) {
       DioManager.instance.setRequestBodyBuilder(requestBodyBuilder);
     }
   }
@@ -37,7 +36,8 @@ class DioInspector extends StatefulWidget implements Pluggable {
   DioPluggableState createState() => DioPluggableState();
 
   @override
-  ImageProvider<Object> get iconImageProvider => MemoryImage(base64Decode(icon.iconData));
+  ImageProvider<Object> get iconImageProvider =>
+      MemoryImage(base64Decode(icon.iconData));
 
   @override
   String get name => 'DioInspector';

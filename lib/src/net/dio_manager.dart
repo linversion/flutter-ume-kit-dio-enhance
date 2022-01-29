@@ -10,7 +10,7 @@ class DioManager {
   static DioManager? _instance;
 
   late Dio _dio;
-  late bool useBot;
+  bool useBot = false;
 
   RequestBodyBuilder? requestBodyBuilder;
 
@@ -45,7 +45,8 @@ class DioManager {
     required String method,
   }) async {
     try {
-      var content = "agent: dio\n$statusCode $method duration: $duration\n$uri\n\nrequest data: "
+      var content =
+          "agent: dio\n$statusCode $method duration: $duration\n$uri\n\nrequest data: "
           "\n$requestData\n"
           "\nresponse body: \n$responseBody\n\nrequest header\n$requestHeader";
       await _dio.post('', data: requestBodyBuilder!(content));
@@ -68,20 +69,16 @@ class DioManager {
     if (url.startsWith(dingTalk) || url.startsWith(weiXin)) {
       //钉钉或微信机器人
       requestBodyBuilder = (content) => {
-        "msgtype": "text",
-        "text": {
-          "content": content
-        }
-      };
+            "msgtype": "text",
+            "text": {"content": content}
+          };
       useBot = true;
     } else if (url.startsWith(feiShu)) {
       //飞书机器人
       requestBodyBuilder = (content) => {
-        "msg_type": "text",
-        "content": {
-          "text": content
-        }
-      };
+            "msg_type": "text",
+            "content": {"text": content}
+          };
       useBot = true;
     }
   }

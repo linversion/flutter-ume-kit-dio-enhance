@@ -6,12 +6,12 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_ume_kit_dio/src/widgets/send_ding_talk_button.dart';
 
 import '../constants/extensions.dart';
 import '../instances.dart';
 import '../pluggable.dart';
 import 'custom_message_page.dart';
+import 'send_bot_button.dart';
 
 const JsonEncoder _encoder = JsonEncoder.withIndent('  ');
 
@@ -344,7 +344,7 @@ class _ResponseCardState extends State<_ResponseCard> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             _infoContent(context),
-            SendDingTalkButton(
+            SendBotButton(
               uri: '$_requestUri',
               requestData: _requestDataBuilder ?? '',
               responseBody: _responseDataBuilder,

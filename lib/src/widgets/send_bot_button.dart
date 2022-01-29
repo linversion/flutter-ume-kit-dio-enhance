@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_ume_kit_dio/src/net/dio_manager.dart';
 
-class SendDingTalkButton extends StatefulWidget {
-  String uri;
-  String requestData;
-  String responseBody;
-  String requestHeader;
-  String duration;
-  String statusCode;
-  String method;
+class SendBotButton extends StatefulWidget {
+  final String uri;
+  final String requestData;
+  final String responseBody;
+  final String requestHeader;
+  final String duration;
+  final String statusCode;
+  final String method;
 
-  SendDingTalkButton({
+  SendBotButton({
     Key? key,
     required this.uri,
     required this.requestData,
@@ -22,12 +22,12 @@ class SendDingTalkButton extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _SendDingTalkButtonState createState() {
-    return _SendDingTalkButtonState();
+  _SendBotButtonState createState() {
+    return _SendBotButtonState();
   }
 }
 
-class _SendDingTalkButtonState extends State<SendDingTalkButton> {
+class _SendBotButtonState extends State<SendBotButton> {
   String status = initial;
 
   static const initial = 'initial';
@@ -74,7 +74,7 @@ class _SendDingTalkButtonState extends State<SendDingTalkButton> {
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),
       child: const Text(
-        'Send DingTalk',
+        'Send to bot',
         style: TextStyle(fontSize: 12, height: 1.2),
       ),
     );
@@ -83,7 +83,8 @@ class _SendDingTalkButtonState extends State<SendDingTalkButton> {
   Widget _status() {
     switch (status) {
       case sending:
-        return SizedBox(width: 10, height: 10, child: CircularProgressIndicator());
+        return SizedBox(
+            width: 10, height: 10, child: CircularProgressIndicator());
       case success:
         return Text('done');
       default:
